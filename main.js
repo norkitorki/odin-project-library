@@ -20,6 +20,20 @@ function Book(title, author, pages, year, read, id = null) {
   this.id = id;
 };
 
+Book.prototype = {
+  toggleRead: function() {
+    return this.read = !this.read;
+  },
+
+  destroy: function() {
+    if (confirm('Are you sure?')) {
+      library.splice(this.id, 1);
+      const node = document.querySelector(`[data-book="${this.id}"]`);
+      if (node) node.parentElement.removeChild(node);
+    }
+  }
+};
+
 function toggleBookForm() {
   [newBook, newBookForm].forEach(el => el.classList.toggle('d-none'));
 };
