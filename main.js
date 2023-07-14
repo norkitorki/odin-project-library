@@ -4,3 +4,5 @@ const sortTable         = document.querySelector('.table-sort');
 const tableBody         = document.querySelector('tbody');
 const newBookForm       = document.querySelector('form');
 const newBookFormSubmit = newBookForm.querySelector('button[type=submit]');
+
+let library = [];
