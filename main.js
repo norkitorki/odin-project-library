@@ -22,3 +22,28 @@ function addBookToLibrary(library, ...args) {
   library.push(book);
   return book;
 };
+
+function addBooksToTable(tableBody, books) {
+  const template = document.getElementById('book-template');
+  let clone, node;
+
+  books.forEach(book => {
+    clone = template.content.cloneNode(true);
+    clone.querySelector('tr').dataset.book = book.id;
+    
+    for(attr in book) {
+      node = clone.querySelector(`.book-${attr}`);
+      
+      if (node && book.hasOwnProperty(attr)) {
+        node.textContent = book[attr];
+
+        if (attr === 'read') {
+          node.addEventListener('click', (event) => event.target.textContent = book.toggleRead());
+          clone.querySelector('.book-delete').addEventListener('click', () => book.destroy());
+        }
+      }
+    }
+
+    tableBody.appendChild(clone);
+  })
+};
