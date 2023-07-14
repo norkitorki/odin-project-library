@@ -11,16 +11,35 @@
     <noscript class="text-light fw-bold">This site requires javascript.Please consider turning it on.</noscript>
 
     <h1 class="text-light fw-bold mb-3">Library</h1>
+      <table class="table table-dark mt-2">
+        <thead>
+          <tr class="table-light">
+            <th>#</th>
             <th>Title</th>
             <th>Author</th>
             <th>Pages</th>
             <th>Year</th>
-            <th>Read</th>
+            <th colspan="2">Read</th>
           </tr>
         </thead>
         <tbody>
+          <!-- Book templates get inserted here -->
         </tbody>
       </table>
+
+      <template id="book-template">
+        <tr>
+          <td class="book-id"></td>
+          <td class="book-title"></td>
+          <td class="book-author"></td>
+          <td class="book-pages"></td>
+          <td class="book-year"></td>
+          <td colspan="2">
+            <a href="#" class="book-read btn btn-primary btn-sm" aria-label="Change read status"></a>
+            <a href="#" class="book-delete btn btn-danger btn-sm" aria-label="Delete book">Delete</a>
+          </td>
+        </tr>
+      </template>
     </main>
   </body>
 </html>
