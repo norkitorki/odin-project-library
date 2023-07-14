@@ -10,7 +10,11 @@ let library = [];
 document.querySelector('main').classList.remove('d-none');
 
 newBook.addEventListener('click', toggleBookForm);
-form.addEventListener('submit', (e) => handleFormSubmission(e));
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  showAlert();
+  handleFormSubmission();
+});
 sortTable.addEventListener('change', sortBooksTable);
 
 function Book(title, author, pages, year, read, id = null) {
@@ -40,8 +44,7 @@ function toggleBookForm() {
   [newBook, newBookForm].forEach(el => el.classList.toggle('d-none'));
 };
 
-function handleFormSubmission(event) {
-  event.preventDefault();
+function handleFormSubmission() {
   if (form.checkValidity()) {
     createBookFromForm(form);
     toggleBookForm();
@@ -50,6 +53,13 @@ function handleFormSubmission(event) {
   } else {
     form.classList.add('was-validated');
   }
+};
+
+function showAlert() {
+  const type = form.checkValidity() ? '.alert-success' : '.alert-danger';
+  const alert = document.querySelector(type);
+  setTimeout(() => alert.classList.add('d-none'), 5000);
+  alert.classList.remove('d-none');
 };
 
 function sortBooksTable() {
