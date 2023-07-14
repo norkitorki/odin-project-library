@@ -7,6 +7,8 @@ const newBookFormSubmit = newBookForm.querySelector('button[type=submit]');
 
 let library = [];
 
+document.querySelector('main').classList.remove('d-none');
+
 newBook.addEventListener('click', toggleBookForm);
 form.addEventListener('submit', (e) => handleFormSubmission(e));
 sortTable.addEventListener('change', sortBooksTable);
