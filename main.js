@@ -110,3 +110,6 @@ function addBooksToTable(tableBody, books) {
     tableBody.appendChild(clone);
   })
 };
+
+addBookToLibrary(library, 'The Hobbit', 'J.R.R. Tolkien', '310', 1937, false);
+addBooksToTable(tableBody, library);
