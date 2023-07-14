@@ -15,3 +15,10 @@ function Book(title, author, pages, year, read, id = null) {
   this.read = read;
   this.id = id;
 };
+
+function addBookToLibrary(library, ...args) {
+  const book = new Book(...args);
+  book.id = library.length + 1;
+  library.push(book);
+  return book;
+};
