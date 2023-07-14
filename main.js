@@ -16,6 +16,22 @@ function Book(title, author, pages, year, read, id = null) {
   this.id = id;
 };
 
+function toggleBookForm() {
+  [newBook, newBookForm].forEach(el => el.classList.toggle('d-none'));
+};
+
+function handleFormSubmission(event) {
+  event.preventDefault();
+  if (form.checkValidity()) {
+    createBookFromForm(form);
+    toggleBookForm();
+    form.reset();
+    form.classList.remove('was-validated');
+  } else {
+    form.classList.add('was-validated');
+  }
+};
+
 function sortBooksTable() {
   if ((new Book).hasOwnProperty(this.value)) {
     sortLibrary(library, this.value);
@@ -36,6 +52,15 @@ function sortLibrary(library, property) {
     return x == y ? 0 : x > y ? 1 : -1;
   })
 };
+
+function createBookFromForm(form) {
+  const attributes = Array.from(form.querySelectorAll('input')).map(input => {
+    return input.id === 'book_read' ? input.checked : input.value
+  });
+  const book = addBookToLibrary.apply(this, [library, ...attributes]);
+  addBooksToTable(tableBody, [book]);
+};
+
 function addBookToLibrary(library, ...args) {
   const book = new Book(...args);
   book.id = library.length + 1;
