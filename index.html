@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="style/style.css">
     <script src="main.js" defer></script>
   </head>
-  <body class="bg-primary p-4">
+  <body class="m-2">
     <noscript class="text-light fw-bold">This site requires javascript to function properly.</noscript>
 
     <h1 class="text-light fw-bold mb-3">Library</h1>
 
-    <main class="d-none my-2">
+    <main class="d-none">
       <div class="alert alert-success d-none" role="alert">
         The book has been successfully created.
       </div>
@@ -21,107 +21,123 @@
         Something prevented the book from being saved.
       </div>
 
-      <a href="#" class="btn btn-warning new-book mb-2 text-bold">New Book</a>
+      <a href="#" class="btn btn-warning new-book fs-5 mb-4 text-bold">New Book</a>
 
-      <form name="bookForm" action="#" method="post" class="w-25 text-bg-dark mb-3 p-4 rounded d-none needs-validation" novalidate>
-        <h3 class="fw-bold mb-4">Add book to library</h3>
+      <div class="form-container text-bg-dark p-4 my-4 rounded d-none">
+        <form name="bookForm" action="#" method="post" class="needs-validation" novalidate>
+          <h3 class="fw-bold mb-4">Add book to library</h3>
+          
+          <div class="my-3">
+            <label class="form-label fw-bold" for="book_title">Title</label>
+            <div class="has-validation">
+              <input type="text" name="book_title" id="book_title" class="form-control invalid" required>
+              <div class="invalid-feedback">
+                Title cannot be blank.
+              </div>
+            </div>
+          </div>
         
-        <div class="my-3">
-          <label class="form-label fw-bold" for="book_title">Title</label>
-          <div class="has-validation">
-            <input type="text" name="book_title" id="book_title" class="form-control invalid" required>
-            <div class="invalid-feedback">
-              Title cannot be blank.
+          <div class="my-3">
+            <label class="form-label fw-bold" for="book_author">Author</label>
+            <div class="has-validation">
+              <input type="text" name="book_author" id="book_author" class="form-control" required>
+              <div class="invalid-feedback">
+                Author cannot be blank.
+              </div>
             </div>
           </div>
-        </div>
-      
-        <div class="my-3">
-          <label class="form-label fw-bold" for="book_author">Author</label>
-          <div class="has-validation">
-            <input type="text" name="book_author" id="book_author" class="form-control" required>
-            <div class="invalid-feedback">
-              Author cannot be blank.
+    
+          <div class="my-3">
+            <label class="form-label fw-bold" for="book_pages">Pages</label>
+            <div class="has-validation">
+              <input type="number" name="book_pages" id="book_pages" min="1" class="form-control" aria-labelledby="book_pages_help" required>
+              <div id="book_pages_help" class="form-text text-light">
+                Pages must be greater than 0.
+              </div>
+              <div class="invalid-feedback">
+                Pages cannot be blank and must be greater than 0.
+              </div>
             </div>
           </div>
-        </div>
-  
-        <div class="my-3">
-          <label class="form-label fw-bold" for="book_pages">Pages</label>
-          <div class="has-validation">
-            <input type="number" name="book_pages" id="book_pages" min="1" class="form-control" aria-labelledby="book_pages_help" required>
-            <div id="book_pages_help" class="form-text text-light">
-              Pages must be greater than 0.
-            </div>
-            <div class="invalid-feedback">
-              Pages cannot be blank and must be greater than 0.
-            </div>
-          </div>
-        </div>
-  
-        <div class="my-3">
-          <label class="form-label fw-bold" for="book_year">Year</label>
-          <div class="has-validation">
-            <input type="number" name="book_year" id="book_year" placeholder="2023" value="2023" min="1" class="form-control" aria-labelledby="book_year_help" required>
-            <div id="book_year_help" class="form-text text-light">
-              Year must be greater than 0.
-            </div>
-            <div class="invalid-feedback">
-              Year cannot be blank and must be greater than 0.
+    
+          <div class="my-3">
+            <label class="form-label fw-bold" for="book_year">Year</label>
+            <div class="has-validation">
+              <input type="number" name="book_year" id="book_year" placeholder="2023" value="2023" min="1" class="form-control" aria-labelledby="book_year_help" required>
+              <div id="book_year_help" class="form-text text-light">
+                Year must be greater than 0.
+              </div>
+              <div class="invalid-feedback">
+                Year cannot be blank and must be greater than 0.
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="form-check my-3">
-          <input class="form-check-input" type="checkbox" value="" id="book_read">
-          <label class="form-check-label fw-bold" for="book_read">
-            I have read the book
-          </label>
-        </div>
-  
-        <div class="form-group">
-          <button class="btn btn-primary" type="submit">Add Book</button>
-          <button class="form-cancel btn btn-danger" type="button" onclick="toggleBookForm()">Cancel</button>
-        </div>
-      </form>
-      
-      <select class="table-sort form-select form-select-sm text-bg-dark" aria-label="Sort library by attribute.">
-        <option selected>Sort by</option>
-        <option value="title">Title</option>
-        <option value="author">Author</option>
-        <option value="pages">Pages</option>
-        <option value="year">Year</option>
-      </select>
+          <div class="form-check my-3">
+            <input class="form-check-input" type="checkbox" value="" id="book_read">
+            <label class="form-check-label fw-bold" for="book_read">
+              I have read the book
+            </label>
+          </div>
+    
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit">Add Book</button>
+            <button class="form-cancel btn btn-danger" type="button" onclick="toggleBookForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
 
-      <table class="table table-dark mt-2">
-        <thead>
-          <tr class="table-light">
-            <th>#</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Pages</th>
-            <th>Year</th>
-            <th colspan="2">Read</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Book templates get inserted here -->
-        </tbody>
-      </table>
+      <div class="main-content">
+        <div class="main-image">
+          <picture>
+            <source srcset="images/library_by_emil_widlund_small.jpg" media="(max-width: 800px)">
+            <source srcset="images/library_by_emil_widlund.jpg" media="(min-width: 1400px)">
+            <img src="images/library_by_emil_widlund_medium.jpg" alt="Wooden multi storied library.">
+          </picture>
+          <span class="image-author text-light">
+            Photo by <a href="https://unsplash.com/@emilwidlund?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Emil Widlund</a>
+          </span>
+        </div>
+        
+        <div class="table-content mt-4">
+          <select class="table-sort form-select form-select-sm text-bg-dark mb-2 ml-2" aria-label="Sort library by attribute.">
+            <option selected>Sort by</option>
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="pages">Pages</option>
+            <option value="year">Year</option>
+          </select>
 
-      <template id="book-template">
-        <tr>
-          <td class="book-id"></td>
-          <td class="book-title"></td>
-          <td class="book-author"></td>
-          <td class="book-pages"></td>
-          <td class="book-year"></td>
-          <td colspan="2">
-            <a href="#" class="book-read btn btn-primary btn-sm" aria-label="Change read status"></a>
-            <a href="#" class="book-delete btn btn-danger btn-sm" aria-label="Delete book">Delete</a>
-          </td>
-        </tr>
-      </template>
+          <table class="table table-dark mt-2">
+            <thead>
+              <tr class="table-light">
+                <th>#</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Pages</th>
+                <th>Year</th>
+                <th colspan="2">Read</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Book templates get inserted here -->
+            </tbody>
+          </table>
+
+          <template id="book-template">
+            <tr>
+              <td class="book-id"></td>
+              <td class="book-title"></td>
+              <td class="book-author"></td>
+              <td class="book-pages"></td>
+              <td class="book-year"></td>
+              <td colspan="2">
+                <a href="#" class="book-read btn btn-primary btn-sm" aria-label="Change read status"></a>
+                <a href="#" class="book-delete btn btn-danger btn-sm" aria-label="Delete book">Delete</a>
+              </td>
+            </tr>
+          </template>
+      </div>
     </main>
   </body>
 </html>

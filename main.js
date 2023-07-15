@@ -2,8 +2,7 @@ const newBook           = document.querySelector('.new-book');
 const form              = document.forms['bookForm'];
 const sortTable         = document.querySelector('.table-sort');
 const tableBody         = document.querySelector('tbody');
-const newBookForm       = document.querySelector('form');
-const newBookFormSubmit = newBookForm.querySelector('button[type=submit]');
+const formContainer     = document.querySelector('.form-container');
 
 let library = [];
 
@@ -41,7 +40,7 @@ Book.prototype = {
 };
 
 function toggleBookForm() {
-  [newBook, newBookForm].forEach(el => el.classList.toggle('d-none'));
+  [newBook, formContainer].forEach(el => el.classList.toggle('d-none'));
 };
 
 function handleFormSubmission() {
