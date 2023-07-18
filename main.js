@@ -1,4 +1,5 @@
 const newBook       = document.querySelector('.new-book');
+const clearLibrary  = document.querySelector('.clear-library');
 const form          = document.forms['bookForm'];
 const sortTable     = document.querySelector('.table-sort');
 const tableBody     = document.querySelector('tbody');
@@ -7,6 +8,7 @@ const formContainer = document.querySelector('.form-container');
 document.querySelector('main').classList.remove('d-none');
 
 newBook.addEventListener('click', toggleBookForm);
+clearLibrary.addEventListener('click', clearAllBooks);
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   showAlert();
@@ -42,6 +44,13 @@ Book.prototype = {
 
 function toggleBookForm() {
   [newBook, formContainer].forEach(el => el.classList.toggle('d-none'));
+};
+
+function clearAllBooks() {
+  if (confirm('You are about to delete all books. Are you sure?')) {
+    tableBody.innerHTML = '';
+    localStorage.setItem('library', '[]');
+  }
 };
 
 function handleFormSubmission() {
