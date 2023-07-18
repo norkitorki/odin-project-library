@@ -91,7 +91,7 @@ function createBookFromForm(form) {
 };
 
 function addBookToLibrary(...args) {
-  if (!localStorage.getItem('library')) localStorage.setItem('library', JSON.stringify([]));
+  if (!localStorage.getItem('library')) localStorage.setItem('library', '[]');
 
   const library = retrieveLibrary();
   const book = new Book(...args);
