@@ -1,10 +1,8 @@
-const newBook           = document.querySelector('.new-book');
-const form              = document.forms['bookForm'];
-const sortTable         = document.querySelector('.table-sort');
-const tableBody         = document.querySelector('tbody');
-const formContainer     = document.querySelector('.form-container');
-
-let library = [];
+const newBook       = document.querySelector('.new-book');
+const form          = document.forms['bookForm'];
+const sortTable     = document.querySelector('.table-sort');
+const tableBody     = document.querySelector('tbody');
+const formContainer = document.querySelector('.form-container');
 
 document.querySelector('main').classList.remove('d-none');
 
@@ -14,7 +12,7 @@ form.addEventListener('submit', (event) => {
   showAlert();
   handleFormSubmission();
 });
-sortTable.addEventListener('change', sortBooksTable);
+sortTable.addEventListener('change', sortBooks);
 
 function Book(title, author, pages, year, read, id = null) {
   this.title = title;
@@ -27,14 +25,17 @@ function Book(title, author, pages, year, read, id = null) {
 
 Book.prototype = {
   toggleRead: function() {
-    return this.read = !this.read;
+    updateBookInLibrary.call(this, 'read', !this.read);
+    return this.read;
   },
 
   destroy: function() {
     if (confirm('Are you sure?')) {
-      library.splice(this.id, 1);
       const node = document.querySelector(`[data-book="${this.id}"]`);
-      if (node) node.parentElement.removeChild(node);
+      if (node) {
+        node.parentElement.removeChild(node);
+        destroyBookFromLibrary.call(this);
+      }
     }
   }
 };
@@ -61,66 +62,102 @@ function showAlert() {
   alert.classList.remove('d-none');
 };
 
-function sortBooksTable() {
-  if ((new Book).hasOwnProperty(this.value)) {
-    sortLibrary(library, this.value);
-    tableBody.innerHTML = '';
-    addBooksToTable(tableBody, library);
-  }
-};
+function sortBooks() {
+  const property = this.value
+  if ((new Book).hasOwnProperty(property)) {
+    let x, y, library = retrieveLibrary();
 
-function sortLibrary(library, property) {
-  let x, y;
-  library.sort((a, b) => {
-    if (Number(a[property])) {
-      x = a[property], y = b[property];
-    } else {
-      x = a[property].toUpperCase(), y = b[property].toUpperCase();
-    }
-  
-    return x == y ? 0 : x > y ? 1 : -1;
-  })
+    library.sort((a, b) => {
+      if (Number(a[property])) {
+        x = a[property], y = b[property];
+      } else {
+        x = a[property].toUpperCase(), y = b[property].toUpperCase();
+      }
+    
+      return x == y ? 0 : x > y ? 1 : -1;
+    })
+
+    updateLibrary(library);
+    resetTable(library);
+  }
 };
 
 function createBookFromForm(form) {
   const attributes = Array.from(form.querySelectorAll('input')).map(input => {
     return input.id === 'book_read' ? input.checked : input.value
   });
-  const book = addBookToLibrary.apply(this, [library, ...attributes]);
-  addBooksToTable(tableBody, [book]);
+  const book = addBookToLibrary(...attributes);
+  addBookToTable(book);
 };
 
-function addBookToLibrary(library, ...args) {
+function addBookToLibrary(...args) {
+  if (!localStorage.getItem('library')) localStorage.setItem('library', JSON.stringify([]));
+
+  const library = retrieveLibrary();
   const book = new Book(...args);
   book.id = library.length + 1;
   library.push(book);
+  updateLibrary(library);
   return book;
 };
 
-function addBooksToTable(tableBody, books) {
+function retrieveLibrary() {
+  return JSON.parse(localStorage.getItem('library'));
+};
+
+function retrieveBookIndex(id, library = retrieveLibrary()) {
+  return library.findIndex(book => book.id === id);
+};
+
+function updateLibrary(library) {
+  return localStorage.setItem('library', JSON.stringify(library));
+};
+
+function updateBookInLibrary(property, value) {
+  const library = retrieveLibrary(), index = retrieveBookIndex(this.id, library);
+  library[index][property] = value;
+  updateLibrary(library);
+  resetTable(library);
+};
+
+function destroyBookFromLibrary() {
+  const library = retrieveLibrary(), index = retrieveBookIndex(this.id, library);
+  library.splice(index, 1);
+  updateLibrary(library);
+};
+
+function addBookToTable(book) {
   const template = document.getElementById('book-template');
   let clone, node;
 
-  books.forEach(book => {
-    clone = template.content.cloneNode(true);
-    clone.querySelector('tr').dataset.book = book.id;
-    
-    for(attr in book) {
-      node = clone.querySelector(`.book-${attr}`);
-      
-      if (node && book.hasOwnProperty(attr)) {
-        node.textContent = book[attr];
+  Object.setPrototypeOf(book, Book.prototype);
 
-        if (attr === 'read') {
-          node.addEventListener('click', (event) => event.target.textContent = book.toggleRead());
-          clone.querySelector('.book-delete').addEventListener('click', () => book.destroy());
-        }
+  clone = template.content.cloneNode(true);
+  clone.querySelector('tr').dataset.book = book.id;
+
+  for(property in book) {
+    node = clone.querySelector(`.book-${property}`);
+
+    if (node && book.hasOwnProperty(property)) {
+      node.textContent = book[property];
+
+      if (property === 'read') {
+        node.addEventListener('click', (event) => event.target.textContent = book.toggleRead());
+        clone.querySelector('.book-delete').addEventListener('click', () => book.destroy());
       }
     }
+  }
 
-    tableBody.appendChild(clone);
-  })
+  tableBody.appendChild(clone);
 };
 
-addBookToLibrary(library, 'The Hobbit', 'J.R.R. Tolkien', '310', 1937, false);
-addBooksToTable(tableBody, library);
+function resetTable(library = retrieveLibrary()) {
+  tableBody.innerHTML = '';
+  library.forEach(book => addBookToTable(book))
+};
+
+if (!localStorage.getItem('library')) {
+  addBookToLibrary('The Hobbit', 'J.R.R. Tolkien', '310', 1937, false);
+};
+
+resetTable();
