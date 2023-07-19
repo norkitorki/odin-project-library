@@ -22,11 +22,28 @@
         Something prevented the book from being saved.
       </div>
 
-      <a href="#" class="btn btn-warning new-book fs-5 mb-4 text-bold">New Book</a>
-      <a href="#" class="btn btn-danger clear-library fs-5 mb-4 text-bold">Clear Library</a>
+      <div class="actions">
+        <a href="#" class="btn btn-warning new-book fs-5 mb-4 text-bold">New Book</a>
+        <a href="#" class="btn btn-danger clear-library fs-5 mb-4 text-bold">Clear Library</a>
+        <a href="#" class="btn btn-primary save-library fs-5 mb-4 text-bold">Save Library to File</a>
+        <a href="#" class="btn btn-primary import-library fs-5 mb-4 text-bold float-right">Import Library</a>
+      </div>
 
       <div class="form-container text-bg-dark p-4 my-4 rounded d-none">
-        <form name="bookForm" action="#" method="post" class="needs-validation" novalidate>
+        <form name="importForm" action="#" method="post" id="import-form" class="needs-validation d-none" novalidate>
+          <h3 class="fw-bold mb-4">Import library from file</h3>
+  
+          <div class="my-3">
+            <label class="form-label fw-bold" for="library_import">File</label>
+            <input type="file" name="library_import" id="library_import" class="form-control invalid" accept=".txt" required>
+          </div>
+  
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit">Submit</button>
+          </div>
+        </form>
+
+        <form name="bookForm" action="#" method="post" class="needs-validation d-none" novalidate>
           <h3 class="fw-bold mb-4">Add book to library</h3>
           
           <div class="my-3">
@@ -84,11 +101,11 @@
     
           <div class="form-group">
             <button class="btn btn-primary" type="submit">Add Book</button>
-            <button class="form-cancel btn btn-danger" type="button" onclick="toggleBookForm()">Cancel</button>
           </div>
         </form>
+        <button class="form-cancel btn btn-danger" type="button" onclick="toggleBookForm()">Cancel</button>
       </div>
-
+      
       <div class="main-content">
         <div class="main-image">
           <picture>
