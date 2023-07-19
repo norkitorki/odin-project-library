@@ -1,19 +1,21 @@
+const actions       = document.querySelector('.actions');
 const newBook       = document.querySelector('.new-book');
 const clearLibrary  = document.querySelector('.clear-library');
-const form          = document.forms['bookForm'];
+const saveLibrary   = document.querySelector('.save-library');
+const importLibrary = document.querySelector('.import-library');
+const formContainer = document.querySelector('.form-container');
+const bookForm      = document.forms['bookForm'];
+const importForm    = document.forms['importForm'];
 const sortTable     = document.querySelector('.table-sort');
 const tableBody     = document.querySelector('tbody');
-const formContainer = document.querySelector('.form-container');
 
 document.querySelector('main').classList.remove('d-none');
 
-newBook.addEventListener('click', toggleBookForm);
+[newBook, importLibrary].forEach(btn => btn.addEventListener('click', toggleBookForm));
 clearLibrary.addEventListener('click', clearAllBooks);
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  showAlert();
-  handleFormSubmission();
-});
+saveLibrary.addEventListener('click', saveLibraryToFile);
+bookForm.addEventListener('submit', (e) => submitBookForm(e));
+importForm.addEventListener('submit', (e) => importLibraryFromFile(e, importForm));
 sortTable.addEventListener('change', sortBooks);
 
 function Book(title, author, pages, year, read, id = null) {
@@ -43,7 +45,16 @@ Book.prototype = {
 };
 
 function toggleBookForm() {
-  [newBook, formContainer].forEach(el => el.classList.toggle('d-none'));
+  [actions, newBook, importLibrary, formContainer].forEach(el => {
+    el.classList.toggle('d-none');
+  });
+  if (this === newBook) {
+    bookForm.classList.remove('d-none');
+    importForm.classList.add('d-none');
+  } else if (this === importLibrary) {
+    bookForm.classList.add('d-none');
+    importForm.classList.remove('d-none');
+  }
 };
 
 function clearAllBooks() {
@@ -53,7 +64,38 @@ function clearAllBooks() {
   }
 };
 
-function handleFormSubmission() {
+function saveLibraryToFile() {
+  let blob = new Blob([localStorage.getItem('library')], { type: "text/plain;charset=utf-8" });
+  saveAs(blob, `odin-library_${(new Date).toLocaleDateString()}.txt`);
+};
+
+function submitBookForm(event) {
+  event.preventDefault();
+  showAlert(bookForm);
+  handleFormSubmission(bookForm);
+};
+
+function importLibraryFromFile(event, form) {
+  event.preventDefault();
+  const file = importForm.elements[0].files[0];
+  
+  if (file && file.type === 'text/plain') {
+    if (confirm('This will overwrite your current library. Are you sure?')) {
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.addEventListener('load', () => {
+        localStorage.setItem('library', reader.result);
+        resetTable();
+      });
+      form.reset();
+      toggleBookForm()
+    }
+  } else {
+    alert('No file has been selected or the file format is invalid');
+  }
+};
+
+function handleFormSubmission(form) {
   if (form.checkValidity()) {
     createBookFromForm(form);
     toggleBookForm();
@@ -64,7 +106,7 @@ function handleFormSubmission() {
   }
 };
 
-function showAlert() {
+function showAlert(form) {
   const type = form.checkValidity() ? '.alert-success' : '.alert-danger';
   const alert = document.querySelector(type);
   setTimeout(() => alert.classList.add('d-none'), 5000);
