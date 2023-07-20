@@ -71,6 +71,3 @@ class Library {
     return localStorage.getItem(this.name);
   }
 };
-
-const lib = new Library('another_library', 200, 2, 0);
-
