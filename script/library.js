@@ -13,14 +13,12 @@ class Library {
   }
 
   removeBook(book) {
-    const index = this.indexOf(book);
-    this.#library.splice(index, 1);
+    this.#library.splice(this.indexOf(book), 1);
     this.update();
   }
 
   updateBook(book, property, value) {
-    const index = this.indexOf(book);
-    this.#library[index][property] = value;
+    this.#library[this.indexOf(book)][property] = value;
     this.update();
     return value;
   }
