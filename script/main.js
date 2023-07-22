@@ -9,45 +9,21 @@ const importForm    = document.forms['importForm'];
 const sortTable     = document.querySelector('.table-sort');
 const tableBody     = document.querySelector('tbody');
 
+const library = new Library('library', new Book('The Hobbit', 'J.R.R. Tolkien', '310', 1937, false));
+const table   = new BookTable(tableBody);
+
 document.querySelector('main').classList.remove('d-none');
 
 [newBook, importLibrary].forEach(btn => btn.addEventListener('click', toggleBookForm));
 clearLibrary.addEventListener('click', clearAllBooks);
 saveLibrary.addEventListener('click', saveLibraryToFile);
 bookForm.addEventListener('submit', (e) => submitBookForm(e));
-importForm.addEventListener('submit', (e) => importLibraryFromFile(e, importForm));
+importForm.addEventListener('submit', (e) => importLibraryFromFile(e, library, importForm));
 sortTable.addEventListener('change', sortBooks);
 
-function Book(title, author, pages, year, read, id = null) {
-  this.title = title;
-  this.author = author;
-  this.pages = Number(pages);
-  this.year = Number(year);
-  this.read = read;
-  this.id = id;
-};
-
-Book.prototype = {
-  toggleRead: function() {
-    updateBookInLibrary.call(this, 'read', !this.read);
-    return this.read;
-  },
-
-  destroy: function() {
-    if (confirm('Are you sure?')) {
-      const node = document.querySelector(`[data-book="${this.id}"]`);
-      if (node) {
-        node.parentElement.removeChild(node);
-        destroyBookFromLibrary.call(this);
-      }
-    }
-  }
-};
-
 function toggleBookForm() {
-  [actions, newBook, importLibrary, formContainer].forEach(el => {
-    el.classList.toggle('d-none');
-  });
+  [actions, newBook, importLibrary, formContainer].forEach(el => el.classList.toggle('d-none'));
+
   if (this === newBook) {
     bookForm.classList.remove('d-none');
     importForm.classList.add('d-none');
@@ -59,15 +35,15 @@ function toggleBookForm() {
 
 function clearAllBooks() {
   if (confirm('You are about to delete all books. Are you sure?')) {
-    tableBody.innerHTML = '';
-    localStorage.setItem('library', '[]');
+    table.clear();
+    library.clear();
+    Book.resetBookCount();
   }
 };
 
 function saveLibraryToFile() {
-  let blob = new Blob([localStorage.getItem('library')], { type: "text/plain;charset=utf-8" });
-  saveAs(blob, `odin-library_${(new Date).toLocaleDateString()}.txt`);
-};
+  return library.saveToFile();
+}
 
 function submitBookForm(event) {
   event.preventDefault();
@@ -75,7 +51,7 @@ function submitBookForm(event) {
   handleFormSubmission(bookForm);
 };
 
-function importLibraryFromFile(event, form) {
+function importLibraryFromFile(event, library, form) {
   event.preventDefault();
   const file = importForm.elements[0].files[0];
   
@@ -84,11 +60,12 @@ function importLibraryFromFile(event, form) {
       const reader = new FileReader();
       reader.readAsText(file);
       reader.addEventListener('load', () => {
-        localStorage.setItem('library', reader.result);
+        library.importFromFile(reader.result);
+        Book.updateBookCount(library.toArray().length);
         resetTable();
       });
       form.reset();
-      toggleBookForm()
+      toggleBookForm();
     }
   } else {
     alert('No file has been selected or the file format is invalid');
@@ -114,22 +91,9 @@ function showAlert(form) {
 };
 
 function sortBooks() {
-  const property = this.value
-  if ((new Book).hasOwnProperty(property)) {
-    let x, y, library = retrieveLibrary();
-
-    library.sort((a, b) => {
-      if (Number(a[property])) {
-        x = a[property], y = b[property];
-      } else {
-        x = a[property].toUpperCase(), y = b[property].toUpperCase();
-      }
-    
-      return x == y ? 0 : x > y ? 1 : -1;
-    })
-
-    updateLibrary(library);
-    resetTable(library);
+  if (this.value !== 'Sort by') {
+    library.sort(this.value);
+    table.reset(library.toArray());
   }
 };
 
@@ -142,73 +106,37 @@ function createBookFromForm(form) {
 };
 
 function addBookToLibrary(...args) {
-  if (!localStorage.getItem('library')) localStorage.setItem('library', '[]');
-
-  const library = retrieveLibrary();
   const book = new Book(...args);
-  book.id = library.length + 1;
-  library.push(book);
-  updateLibrary(library);
+  library.addBook(book);
   return book;
 };
 
-function retrieveLibrary() {
-  return JSON.parse(localStorage.getItem('library'));
-};
-
-function retrieveBookIndex(id, library = retrieveLibrary()) {
-  return library.findIndex(book => book.id === id);
-};
-
-function updateLibrary(library) {
-  return localStorage.setItem('library', JSON.stringify(library));
-};
-
-function updateBookInLibrary(property, value) {
-  const library = retrieveLibrary(), index = retrieveBookIndex(this.id, library);
-  library[index][property] = value;
-  updateLibrary(library);
-  resetTable(library);
-};
-
-function destroyBookFromLibrary() {
-  const library = retrieveLibrary(), index = retrieveBookIndex(this.id, library);
-  library.splice(index, 1);
-  updateLibrary(library);
-};
-
 function addBookToTable(book) {
-  const template = document.getElementById('book-template');
-  let clone, node;
+  table.addBook(book, 'book-template');
 
-  Object.setPrototypeOf(book, Book.prototype);
+  table.body.querySelector(`[data-book="${book.id}"] .book-read`).addEventListener('click', function(event) {
+    event.preventDefault();
+    this.textContent = library.updateBook(book, 'read', !book.read);
+  });
 
-  clone = template.content.cloneNode(true);
-  clone.querySelector('tr').dataset.book = book.id;
+  table.body.querySelector(`[data-book="${book.id}"] .book-delete`).addEventListener('click', function() { removeBook(book) });
+};
 
-  for(property in book) {
-    node = clone.querySelector(`.book-${property}`);
-
-    if (node && book.hasOwnProperty(property)) {
-      node.textContent = book[property];
-
-      if (property === 'read') {
-        node.addEventListener('click', (event) => event.target.textContent = book.toggleRead());
-        clone.querySelector('.book-delete').addEventListener('click', () => book.destroy());
-      }
-    }
+function removeBook(book) {
+  if (confirm('Are you sure?')) {
+    Book.updateBookCount();
+    table.removeBook(book);
+    library.removeBook(book);
   }
+}
 
-  tableBody.appendChild(clone);
-};
-
-function resetTable(library = retrieveLibrary()) {
-  tableBody.innerHTML = '';
-  library.forEach(book => addBookToTable(book))
-};
-
-if (!localStorage.getItem('library')) {
-  addBookToLibrary('The Hobbit', 'J.R.R. Tolkien', '310', 1937, false);
+function resetTable() {
+  table.clear();
+  Book.resetBookCount();
+  library.toArray().forEach(book => {
+    if (book.id > Book.bookCount()) Book.updateBookCount(book.id);
+    addBookToTable(book);
+  })
 };
 
 resetTable();
