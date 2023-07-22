@@ -32,6 +32,11 @@ class Library {
     saveAs(blob, `odin-library_${(new Date).toLocaleDateString()}.txt`);
   }
 
+  importFromFile(fileContent) {
+    this.#library = JSON.parse(fileContent);
+    return this.update();
+  }
+
   sort(property) {
     let x, y
   
