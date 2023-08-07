@@ -43,7 +43,7 @@ function clearAllBooks() {
 
 function saveLibraryToFile() {
   return library.saveToFile();
-}
+};
 
 function submitBookForm(event) {
   event.preventDefault();
@@ -99,7 +99,7 @@ function sortBooks() {
 
 function createBookFromForm(form) {
   const attributes = Array.from(form.querySelectorAll('input')).map(input => {
-    return input.id === 'book_read' ? input.checked : input.value
+    return input.id === 'book_read' ? input.checked : input.value;
   });
   const book = addBookToLibrary(...attributes);
   addBookToTable(book);
@@ -128,7 +128,7 @@ function removeBook(book) {
     table.removeBook(book);
     library.removeBook(book);
   }
-}
+};
 
 function resetTable() {
   table.clear();
